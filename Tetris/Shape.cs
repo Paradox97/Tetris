@@ -175,7 +175,6 @@ namespace Tetris
                   }
               }
 
-
               return 0;
         }
 
@@ -278,7 +277,6 @@ namespace Tetris
             for (int i = 0; i < SHAPE_SIZE; i++)
             {
                 move_down_map.Add(new shape_block { x_coord = shape_map[i].x_coord, y_coord = shape_map[i].y_coord + 1});
-                //Console.WriteLine(move_down_map[i].y_coord);
             }
 
             if((check_out_of_bounds(move_down_map, grid) == 1) || (check_collisions(move_down_map, shape_map, grid) == 1))      //bottom collision
