@@ -11,7 +11,7 @@ namespace Tetris
         //public int x_coord, y_coord;
         const int SHAPE_QUANTITY = 5, SHAPE_SIZE = 4;
 
-        public enum Shapetype
+        private enum Shapetype
         {
             line = 0,
             l_shape = 1,
@@ -42,7 +42,7 @@ namespace Tetris
             shape_map_create(X, Y);
         }
 
-        public void shape_map_create(int X, int Y)      //hard coded shapes
+        private void shape_map_create(int X, int Y)      //hard coded shapes
         {
             Random rand = new Random();
             
@@ -164,7 +164,7 @@ namespace Tetris
 
         }
 
-        public int check_collisions(List<shape_block> change_map, List<shape_block> orig_map, Field grid)
+        private int check_collisions(List<shape_block> change_map, List<shape_block> orig_map, Field grid)
         {
             
               for (int i = 0; i < change_map.Count; i++)           
@@ -179,7 +179,7 @@ namespace Tetris
         }
 
 
-        public int check_self(shape_block change_map_part, List<shape_block> orig_map)  //if piece of the new map corresponds to original map
+        private int check_self(shape_block change_map_part, List<shape_block> orig_map)  //if piece of the new map corresponds to original map
         {
             for (int i = 0; i < orig_map.Count; i++)
             {
@@ -192,7 +192,7 @@ namespace Tetris
         }
 
 
-        public int check_out_of_bounds(List<shape_block> map, Field grid)
+        private int check_out_of_bounds(List<shape_block> map, Field grid)
         {
             for (int i = 0; i < SHAPE_SIZE; i++)
             {
@@ -205,7 +205,7 @@ namespace Tetris
             return 0;
         }
 
-        public int reposition(List<shape_block> change_map, List<shape_block> orig_map, Field grid)
+        private void reposition(List<shape_block> change_map, List<shape_block> orig_map, Field grid)
         {
             for (int i = 0; i < SHAPE_SIZE; i++)
             {
@@ -218,13 +218,10 @@ namespace Tetris
                 grid.area[change_map[i].x_coord, change_map[i].y_coord] = '#';
             }
 
-            return 0;
         }
 
-        public int rotation_transformation(List<shape_block> change_map, List<shape_block> orig_map, Field grid)
+        private void rotation_transformation(List<shape_block> change_map, List<shape_block> orig_map, Field grid)
         {
-            
-
             int delta_x = orig_map[centre].x_coord;         //placing shape block at (0,0) for rotation simplicity then placing it back where it was, delta = current coordinates of the figure        
             int delta_y = orig_map[centre].y_coord;         //referring to the shape's centre
 
@@ -245,7 +242,6 @@ namespace Tetris
             {
                 change_map[i] = new shape_block { x_coord = change_map[i].x_coord + delta_new_x, y_coord = change_map[i].y_coord + delta_new_y };
             }
-            return 0;
         }
 
 
