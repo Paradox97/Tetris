@@ -125,7 +125,7 @@ namespace Tetris
         }
 
 
-        public async Task update(ConsoleKeyInfo input, int PLAYER_TIMEOUT, Field grid, Shape figure)
+        public int update(ConsoleKeyInfo input, int PLAYER_TIMEOUT, Field grid, Shape figure)
         {
             input = Console.ReadKey(true);
             var Result = input;
@@ -149,7 +149,7 @@ namespace Tetris
                         break;
                 }
 
-               return;
+               return 0;
         }
 
         void late_update() 
