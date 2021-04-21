@@ -81,8 +81,23 @@ namespace Tetris
 
         }
 
-        public void gravity()
+        public void apply_gravity(Field grid, int row)
         {
+
+            if (row - 1 < 0)
+            {
+                return;
+            }
+
+            for (int i = row; i > 0; i--)
+            {
+                for (int j = 0; j < grid.width; j++)
+                {
+                    grid.area[j, i] = grid.area[j, i - 1];
+                    //grid.area[j, i - 1] = ' ';  // только если гравитация действует на 1 ряд
+                }
+            }
+
 
         }
         
@@ -101,7 +116,10 @@ namespace Tetris
                 row = i;
 
                 if (row_map.IndexOf(' ') == -1)
+                {
                     clear_row(grid, row);
+                    apply_gravity(grid, row);
+                }
 
                 row_map = String.Empty;
             }
