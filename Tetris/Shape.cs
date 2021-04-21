@@ -170,6 +170,64 @@ namespace Tetris
 
         }
 
+        public int check_collisions(List<shape_block> change_map, List<shape_block> orig_map, Field grid)
+        {
+            
+              for (int i = 0; i < change_map.Count; i++)           
+              {
+                  if ((grid.area[change_map[i].x_coord, change_map[i].y_coord] == '#') && (check_if_self(change_map[i], orig_map) == 1) ) //check if self
+                  {
+                      return 1;
+                  }
+              }
+
+
+              return 0;
+        }
+
+
+        public int check_if_self(shape_block change_map_part, List<shape_block> orig_map)  //if piece of the new map corresponds to original map
+        {
+            for (int i = 0; i < orig_map.Count; i++)
+            {
+                if ((orig_map[i].x_coord == change_map_part.x_coord) && (orig_map[i].y_coord == change_map_part.y_coord))
+                {
+                    return 0;
+                }
+            }
+            return 1;
+        }
+
+
+        public int check_out_of_bounds(List<shape_block> map, Field grid)
+        {
+            for (int i = 0; i < SHAPE_SIZE; i++)
+            {
+                if ((map[i].x_coord > grid.width - 1) || (map[i].y_coord > grid.height - 1) || (map[i].x_coord < 0) || (map[i].y_coord < 0))
+                {
+                    return 1;
+                }
+            }
+
+            return 0;
+        }
+
+        public int reposition(List<shape_block> change_map, List<shape_block> orig_map, Field grid)
+        {
+            for (int i = 0; i < SHAPE_SIZE; i++)
+            {
+                grid.area[orig_map[i].x_coord, orig_map[i].y_coord] = ' ';      //cleaning up figure trails  
+            }
+
+            for (int i = 0; i < SHAPE_SIZE; i++)
+            {
+                orig_map[i] = new shape_block { x_coord = change_map[i].x_coord, y_coord = change_map[i].y_coord };
+                grid.area[change_map[i].x_coord, change_map[i].y_coord] = '#';
+            }
+
+            return 0;
+        }
+
 
         public int rotate(Field grid)
         {
@@ -179,7 +237,7 @@ namespace Tetris
 
             List<shape_block> rotation_map = new List<shape_block>();
 
-            //placing shape block at (0,0) for rotation simplicity then place it back where it was, delta = current coordinates of the figure
+            //placing shape block at (0,0) for rotation simplicity then placing it back where it was, delta = current coordinates of the figure
 
             //создавать при создании фигуры центр
             
@@ -212,43 +270,28 @@ namespace Tetris
                 rotation_map[i] = new shape_block { x_coord = rotation_map[i].x_coord + delta_new_x, y_coord = rotation_map[i].y_coord + delta_new_y };
             }
 
+
+
+            /*
             for (int i = 0; i < SHAPE_SIZE; i++)
             {
                 if ((rotation_map[i].x_coord > grid.width - 1) || (rotation_map[i].y_coord > grid.height - 1) || (rotation_map[i].x_coord < 0) || (rotation_map[i].y_coord < 0))
                 {
                     return 1;
                 }
-            }
-
-            /*
-             for (int i = 0; i <rotation_map.Count; i++)           //checking collisions with near blocks
-             {
-                 if (grid.area[rotation_map[i].x_coord, rotation_map[i].y_coord] == 1)
-                 {
-                     return 1;
-                 }
-             }*/
+            }*/
 
 
-            /* for (int i = 0; i < shape_map.Count; i++)
-             {
-                 shape_map[i] = new shape_block { x_coord = rotation_map[i].x_coord, y_coord = rotation_map[i].y_coord };
-                 grid.area[rotation_map[i].x_coord, rotation_map[i].y_coord] = '*';
-             }
-            */
+            if (check_out_of_bounds(rotation_map, grid) == 1)
+                return 1;
 
 
-            for (int i = 0; i < SHAPE_SIZE; i++)
-            {
-                grid.area[shape_map[i].x_coord, shape_map[i].y_coord] = ' ';      //cleaning up figure trails  
-            }
 
-            for (int i = 0; i < SHAPE_SIZE; i++)
-            {
-                shape_map[i] = new shape_block { x_coord = rotation_map[i].x_coord, y_coord = rotation_map[i].y_coord };
-                grid.area[rotation_map[i].x_coord, rotation_map[i].y_coord] = '#';
-            }
 
+             if (check_collisions(rotation_map, shape_map, grid) == 1)
+               return 1;
+
+            reposition(rotation_map, shape_map, grid);
             return 0;
 
         }
@@ -263,41 +306,18 @@ namespace Tetris
                 //Console.WriteLine(move_down_map[i].y_coord);
             }
 
-            for (int i = 0; i < SHAPE_SIZE; i++)
+
+            if(check_out_of_bounds(move_down_map, grid) == 1)
             {
-                if ((move_down_map[i].x_coord > grid.width - 1) || (move_down_map[i].y_coord > grid.height - 1) || (move_down_map[i].x_coord < 0) || (move_down_map[i].y_coord < 0))
-                {
-                    shape_map_create(grid.start_x, grid.start_y);
-
-
-                    return 1;
-                }
-                //Console.WriteLine(move_down_map[i].y_coord);
+                shape_map_create(grid.start_x, grid.start_y);
+                return 1;
             }
 
-            /*
-            for (int i = 0; i < move_down_map.Count; i++)           //checking collisions with near blocks
-            {
-                if (grid.area[move_down_map[i].x_coord, move_down_map[i].y_coord] == 1)             //if the block is at the "bottom" already
-                {
-                    //Console.WriteLine("3");
-                    stop_falling = true;
-                }
-            }*/
+            if (check_collisions(move_down_map, shape_map, grid) == 1)
+                return 1;
 
-            for (int i = 0; i < SHAPE_SIZE; i++)
-              {
-                  grid.area[shape_map[i].x_coord, shape_map[i].y_coord] = ' ';              //cleaning up figure trails  
-              }
 
-            for (int i = 0; i < SHAPE_SIZE; i++)
-              {
-                  shape_map[i] = new shape_block { x_coord = move_down_map[i].x_coord, y_coord = move_down_map[i].y_coord };
-                  grid.area[move_down_map[i].x_coord, move_down_map[i].y_coord] = '#';
-              }
-         
-            //stop_falling = false;
-
+            reposition(move_down_map, shape_map, grid);
             return 0;
         }
 
@@ -311,34 +331,14 @@ namespace Tetris
                 move_right_map.Add(new shape_block { x_coord = shape_map[i].x_coord + 1, y_coord = shape_map[i].y_coord });
             }
 
-            for (int i = 0; i < SHAPE_SIZE; i++)
-            {
-                if ((move_right_map[i].x_coord > grid.width - 1) || (move_right_map[i].y_coord > grid.height - 1))
-                {
-                    return 1;
-                }
-                //Console.WriteLine(move_down_map[i].y_coord);
-            }
+            if (check_out_of_bounds(move_right_map, grid) == 1)
+                return 1;
 
-            /* for (int i = 0; i < move_right_map.Count; i++)           //checking collisions with near blocks
-             {
-                 if (grid.area[move_right_map[i].x_coord, move_right_map[i].y_coord] == 1)
-                     return 1;
-             }
-            */
+            if (check_collisions(move_right_map, shape_map, grid) == 1)
+                return 1;
 
-            for (int i = 0; i < SHAPE_SIZE; i++)
-            {
-                grid.area[shape_map[i].x_coord, shape_map[i].y_coord] = ' ';      //cleaning up figure trails  
-            }
-            for (int i = 0; i < SHAPE_SIZE; i++)
-            {
-                shape_map[i] = new shape_block { x_coord = move_right_map[i].x_coord, y_coord = move_right_map[i].y_coord };
-                grid.area[move_right_map[i].x_coord, move_right_map[i].y_coord] = '#';
-            }
-
+            reposition(move_right_map, shape_map, grid);
             return 0;
-            //x_coord++;
         }
 
         public int move_left(Field grid)
@@ -350,35 +350,16 @@ namespace Tetris
                 move_left_map.Add(new shape_block { x_coord = shape_map[i].x_coord - 1, y_coord = shape_map[i].y_coord });
             }
 
-            for (int i = 0; i < SHAPE_SIZE; i++)
-            {
-                if ((move_left_map[i].x_coord > grid.width - 1) || (move_left_map[i].y_coord > grid.height - 1) || (move_left_map[i].x_coord < 0) || (move_left_map[i].y_coord < 0))
-                {
-                    return 1;
-                }
-                //Console.WriteLine(move_down_map[i].y_coord);
-            }
 
-            /*
-             for (int i = 0; i < move_left_map.Count; i++)           //checking collisions with near blocks
-             {
-                 if (grid.area[move_left_map[i].x_coord, move_left_map[i].y_coord] == 1)
-                     return 1;
-             }
-            */
+            if (check_out_of_bounds(move_left_map, grid) == 1)
+                return 1;
 
-            for (int i = 0; i < SHAPE_SIZE; i++)
-            {
-                grid.area[shape_map[i].x_coord, shape_map[i].y_coord] = ' ';
-            }
-            for (int i = 0; i < SHAPE_SIZE; i++)
-            {
-                shape_map[i] = new shape_block { x_coord = move_left_map[i].x_coord, y_coord = move_left_map[i].y_coord };
-                grid.area[move_left_map[i].x_coord, move_left_map[i].y_coord] = '#';
-            }
+            if (check_collisions(move_left_map, shape_map, grid) == 1)
+                return 1;
 
+            reposition(move_left_map, shape_map, grid);
             return 0;
-            //x_coord--;
+
         }
 
 
