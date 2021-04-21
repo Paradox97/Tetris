@@ -39,7 +39,6 @@ namespace Tetris
 
         public Shape(int X, int Y) //Shape constructor
         {
-            //current_shape = SHAPES[shape_type];
             shape_map_create(X, Y);
         }
 
@@ -66,7 +65,6 @@ namespace Tetris
                     }
 
                     centre = 1;
-
                     break;
 
                 case 1://l shape
@@ -89,8 +87,7 @@ namespace Tetris
                         );
                     }
 
-                    centre = 2;
-                    
+                    centre = 2;                 
                     break;
 
                 case 2://square shape
@@ -114,7 +111,6 @@ namespace Tetris
                     }
 
                     centre = 0; 
-
                     break;
 
                 case 3://t shape
@@ -137,7 +133,6 @@ namespace Tetris
                     }
 
                     centre = 2;
-
                     break;
 
                 case 4: //s shape
@@ -164,91 +159,113 @@ namespace Tetris
                     }
 
                     centre = 3;
-
                     break;
             }
 
+        }
+
+        public int check_collisions(List<shape_block> change_map, List<shape_block> orig_map, Field grid)
+        {
+            
+              for (int i = 0; i < change_map.Count; i++)           
+              {
+                  if ((grid.area[change_map[i].x_coord, change_map[i].y_coord] == '#') && (check_self(change_map[i], orig_map) == 1) ) //check if self
+                  {
+                      return 1;
+                  }
+              }
+
+              return 0;
+        }
+
+
+        public int check_self(shape_block change_map_part, List<shape_block> orig_map)  //if piece of the new map corresponds to original map
+        {
+            for (int i = 0; i < orig_map.Count; i++)
+            {
+                if ((orig_map[i].x_coord == change_map_part.x_coord) && (orig_map[i].y_coord == change_map_part.y_coord))
+                {
+                    return 0;
+                }
+            }
+            return 1;
+        }
+
+
+        public int check_out_of_bounds(List<shape_block> map, Field grid)
+        {
+            for (int i = 0; i < SHAPE_SIZE; i++)
+            {
+                if ((map[i].x_coord > grid.width - 1) || (map[i].y_coord > grid.height - 1) || (map[i].x_coord < 0) || (map[i].y_coord < 0))
+                {
+                    return 1;
+                }
+            }
+
+            return 0;
+        }
+
+        public int reposition(List<shape_block> change_map, List<shape_block> orig_map, Field grid)
+        {
+            for (int i = 0; i < SHAPE_SIZE; i++)
+            {
+                grid.area[orig_map[i].x_coord, orig_map[i].y_coord] = ' ';      //cleaning up figure trails  
+            }
+
+            for (int i = 0; i < SHAPE_SIZE; i++)
+            {
+                orig_map[i] = new shape_block { x_coord = change_map[i].x_coord, y_coord = change_map[i].y_coord };
+                grid.area[change_map[i].x_coord, change_map[i].y_coord] = '#';
+            }
+
+            return 0;
+        }
+
+        public int rotation_transformation(List<shape_block> change_map, List<shape_block> orig_map, Field grid)
+        {
+            
+
+            int delta_x = orig_map[centre].x_coord;         //placing shape block at (0,0) for rotation simplicity then placing it back where it was, delta = current coordinates of the figure        
+            int delta_y = orig_map[centre].y_coord;         //referring to the shape's centre
+
+            for (int i = 0; i < SHAPE_SIZE; i++)
+            {
+                change_map.Add(new shape_block { x_coord = orig_map[i].x_coord - delta_x, y_coord = orig_map[i].y_coord - delta_y });
+            }
+
+            for (int i = 0; i < SHAPE_SIZE; i++)
+            {
+                change_map[i] = new shape_block { x_coord = change_map[i].y_coord, y_coord = SHAPE_SIZE - orig_map[i].x_coord };
+            }
+ 
+            int delta_new_x = Math.Abs(change_map[centre].x_coord - delta_x); //offset - centre should be in the same location
+            int delta_new_y = Math.Abs(change_map[centre].y_coord - delta_y);
+
+            for (int i = 0; i < SHAPE_SIZE; i++)
+            {
+                change_map[i] = new shape_block { x_coord = change_map[i].x_coord + delta_new_x, y_coord = change_map[i].y_coord + delta_new_y };
+            }
+            return 0;
         }
 
 
         public int rotate(Field grid)
         {
 
-            if (shape_type == 2)
+            if (shape_type == 2)            //square block can't rotate
                 return 1;
 
             List<shape_block> rotation_map = new List<shape_block>();
 
-            //placing shape block at (0,0) for rotation simplicity then place it back where it was, delta = current coordinates of the figure
+            rotation_transformation(rotation_map, shape_map, grid);
 
-            //создавать при создании фигуры центр
-            
-            int delta_x = shape_map[centre].x_coord;
-            int delta_y = shape_map[centre].y_coord;
-            
+            if (check_out_of_bounds(rotation_map, grid) == 1)
+                return 1;
 
+             if (check_collisions(rotation_map, shape_map, grid) == 1)
+               return 1;
 
-            for (int i = 0; i < SHAPE_SIZE; i++)
-            {
-                rotation_map.Add(new shape_block { x_coord = shape_map[i].x_coord - delta_x, y_coord = shape_map[i].y_coord - delta_y});
-            }
-
-            for (int i = 0; i < SHAPE_SIZE; i++)
-            {
-                //  rotation_map[i] = new shape_block { x_coord = rotation_map[i].y_coord + delta_x, y_coord = SHAPE_SIZE - shape_map[i].x_coord + delta_y};
-                rotation_map[i] = new shape_block { x_coord = rotation_map[i].y_coord, y_coord = SHAPE_SIZE - shape_map[i].x_coord};
-            }
-
-
-            //смещение на такое количество клеток, чтобы центр оказался в той же точке, что и был
-            int delta_new_x = Math.Abs(rotation_map[centre].x_coord - delta_x);
-
-            int delta_new_y = Math.Abs(rotation_map[centre].y_coord - delta_y);
-
-
-            for (int i = 0; i < SHAPE_SIZE; i++)
-            {
-                //  rotation_map[i] = new shape_block { x_coord = rotation_map[i].y_coord + delta_x, y_coord = SHAPE_SIZE - shape_map[i].x_coord + delta_y};
-                rotation_map[i] = new shape_block { x_coord = rotation_map[i].x_coord + delta_new_x, y_coord = rotation_map[i].y_coord + delta_new_y };
-            }
-
-            for (int i = 0; i < SHAPE_SIZE; i++)
-            {
-                if ((rotation_map[i].x_coord > grid.width - 1) || (rotation_map[i].y_coord > grid.height - 1) || (rotation_map[i].x_coord < 0) || (rotation_map[i].y_coord < 0))
-                {
-                    return 1;
-                }
-            }
-
-            /*
-             for (int i = 0; i <rotation_map.Count; i++)           //checking collisions with near blocks
-             {
-                 if (grid.area[rotation_map[i].x_coord, rotation_map[i].y_coord] == 1)
-                 {
-                     return 1;
-                 }
-             }*/
-
-
-            /* for (int i = 0; i < shape_map.Count; i++)
-             {
-                 shape_map[i] = new shape_block { x_coord = rotation_map[i].x_coord, y_coord = rotation_map[i].y_coord };
-                 grid.area[rotation_map[i].x_coord, rotation_map[i].y_coord] = '*';
-             }
-            */
-
-
-            for (int i = 0; i < SHAPE_SIZE; i++)
-            {
-                grid.area[shape_map[i].x_coord, shape_map[i].y_coord] = ' ';      //cleaning up figure trails  
-            }
-
-            for (int i = 0; i < SHAPE_SIZE; i++)
-            {
-                shape_map[i] = new shape_block { x_coord = rotation_map[i].x_coord, y_coord = rotation_map[i].y_coord };
-                grid.area[rotation_map[i].x_coord, rotation_map[i].y_coord] = '#';
-            }
-
+            reposition(rotation_map, shape_map, grid);
             return 0;
 
         }
@@ -260,44 +277,16 @@ namespace Tetris
             for (int i = 0; i < SHAPE_SIZE; i++)
             {
                 move_down_map.Add(new shape_block { x_coord = shape_map[i].x_coord, y_coord = shape_map[i].y_coord + 1});
-                //Console.WriteLine(move_down_map[i].y_coord);
             }
 
-            for (int i = 0; i < SHAPE_SIZE; i++)
+            if((check_out_of_bounds(move_down_map, grid) == 1) || (check_collisions(move_down_map, shape_map, grid) == 1))      //bottom collision
             {
-                if ((move_down_map[i].x_coord > grid.width - 1) || (move_down_map[i].y_coord > grid.height - 1) || (move_down_map[i].x_coord < 0) || (move_down_map[i].y_coord < 0))
-                {
-                    shape_map_create(grid.start_x, grid.start_y);
 
-
-                    return 1;
-                }
-                //Console.WriteLine(move_down_map[i].y_coord);
+                shape_map_create(grid.start_x, grid.start_y);
+                return 1;
             }
 
-            /*
-            for (int i = 0; i < move_down_map.Count; i++)           //checking collisions with near blocks
-            {
-                if (grid.area[move_down_map[i].x_coord, move_down_map[i].y_coord] == 1)             //if the block is at the "bottom" already
-                {
-                    //Console.WriteLine("3");
-                    stop_falling = true;
-                }
-            }*/
-
-            for (int i = 0; i < SHAPE_SIZE; i++)
-              {
-                  grid.area[shape_map[i].x_coord, shape_map[i].y_coord] = ' ';              //cleaning up figure trails  
-              }
-
-            for (int i = 0; i < SHAPE_SIZE; i++)
-              {
-                  shape_map[i] = new shape_block { x_coord = move_down_map[i].x_coord, y_coord = move_down_map[i].y_coord };
-                  grid.area[move_down_map[i].x_coord, move_down_map[i].y_coord] = '#';
-              }
-         
-            //stop_falling = false;
-
+            reposition(move_down_map, shape_map, grid);
             return 0;
         }
 
@@ -311,34 +300,14 @@ namespace Tetris
                 move_right_map.Add(new shape_block { x_coord = shape_map[i].x_coord + 1, y_coord = shape_map[i].y_coord });
             }
 
-            for (int i = 0; i < SHAPE_SIZE; i++)
-            {
-                if ((move_right_map[i].x_coord > grid.width - 1) || (move_right_map[i].y_coord > grid.height - 1))
-                {
-                    return 1;
-                }
-                //Console.WriteLine(move_down_map[i].y_coord);
-            }
+            if (check_out_of_bounds(move_right_map, grid) == 1)
+                return 1;
 
-            /* for (int i = 0; i < move_right_map.Count; i++)           //checking collisions with near blocks
-             {
-                 if (grid.area[move_right_map[i].x_coord, move_right_map[i].y_coord] == 1)
-                     return 1;
-             }
-            */
+            if (check_collisions(move_right_map, shape_map, grid) == 1)
+                return 1;
 
-            for (int i = 0; i < SHAPE_SIZE; i++)
-            {
-                grid.area[shape_map[i].x_coord, shape_map[i].y_coord] = ' ';      //cleaning up figure trails  
-            }
-            for (int i = 0; i < SHAPE_SIZE; i++)
-            {
-                shape_map[i] = new shape_block { x_coord = move_right_map[i].x_coord, y_coord = move_right_map[i].y_coord };
-                grid.area[move_right_map[i].x_coord, move_right_map[i].y_coord] = '#';
-            }
-
+            reposition(move_right_map, shape_map, grid);
             return 0;
-            //x_coord++;
         }
 
         public int move_left(Field grid)
@@ -350,35 +319,15 @@ namespace Tetris
                 move_left_map.Add(new shape_block { x_coord = shape_map[i].x_coord - 1, y_coord = shape_map[i].y_coord });
             }
 
-            for (int i = 0; i < SHAPE_SIZE; i++)
-            {
-                if ((move_left_map[i].x_coord > grid.width - 1) || (move_left_map[i].y_coord > grid.height - 1) || (move_left_map[i].x_coord < 0) || (move_left_map[i].y_coord < 0))
-                {
-                    return 1;
-                }
-                //Console.WriteLine(move_down_map[i].y_coord);
-            }
+            if (check_out_of_bounds(move_left_map, grid) == 1)
+                return 1;
 
-            /*
-             for (int i = 0; i < move_left_map.Count; i++)           //checking collisions with near blocks
-             {
-                 if (grid.area[move_left_map[i].x_coord, move_left_map[i].y_coord] == 1)
-                     return 1;
-             }
-            */
+            if (check_collisions(move_left_map, shape_map, grid) == 1)
+                return 1;
 
-            for (int i = 0; i < SHAPE_SIZE; i++)
-            {
-                grid.area[shape_map[i].x_coord, shape_map[i].y_coord] = ' ';
-            }
-            for (int i = 0; i < SHAPE_SIZE; i++)
-            {
-                shape_map[i] = new shape_block { x_coord = move_left_map[i].x_coord, y_coord = move_left_map[i].y_coord };
-                grid.area[move_left_map[i].x_coord, move_left_map[i].y_coord] = '#';
-            }
-
+            reposition(move_left_map, shape_map, grid);
             return 0;
-            //x_coord--;
+
         }
 
 

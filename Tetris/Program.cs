@@ -12,7 +12,6 @@ namespace Tetris
 {
     public class Field
     {
-   
         public int width, height;
 
         public int block_size;
@@ -81,8 +80,23 @@ namespace Tetris
 
         }
 
-        public void gravity()
+        public void apply_gravity(Field grid, int row)
         {
+
+            if (row - 1 < 0)
+            {
+                return;
+            }
+
+            for (int i = row; i > 0; i--)
+            {
+                for (int j = 0; j < grid.width; j++)
+                {
+                    grid.area[j, i] = grid.area[j, i - 1];
+                    //grid.area[j, i - 1] = ' ';  // только если гравитация действует на 1 ряд
+                }
+            }
+
 
         }
         
@@ -101,7 +115,10 @@ namespace Tetris
                 row = i;
 
                 if (row_map.IndexOf(' ') == -1)
+                {
                     clear_row(grid, row);
+                    apply_gravity(grid, row);
+                }
 
                 row_map = String.Empty;
             }
@@ -110,16 +127,8 @@ namespace Tetris
 
         public async Task update(ConsoleKeyInfo input, int PLAYER_TIMEOUT, Field grid, Shape figure)
         {
-
-            //var UserInput = Console.Read(); // Get user input
-            //Console.WriteLine(UserInput);
             input = Console.ReadKey(true);
             var Result = input;
-
-            //   await Task.Run(async () =>
-            //   {
-         //   while (input.Key != ConsoleKey.Escape)
-        //    {
 
                 switch (input.Key)
                 {
@@ -139,15 +148,8 @@ namespace Tetris
                         figure.rotate(grid);
                         break;
                 }
-      //      }
-
-                   //await Task.Delay(PLAYER_TIMEOUT);
-                   //Console.WriteLine(PLAYER_TIMEOUT);
-              // }
 
                return;
-        //   });
-
         }
 
         void late_update() 
@@ -159,7 +161,7 @@ namespace Tetris
 
         static void Main(string[] args)
         {
-            int PLAYER_TIMEOUT = 4;
+            const int PLAYER_TIMEOUT = 4, MAGIC_NUMBER = 150;
 
             Field grid = new Field(15, 20, 5, 0, 10, "Player1");
 
@@ -177,22 +179,16 @@ namespace Tetris
             while (input.Key != ConsoleKey.Escape)
              {
 
+                Task task_update = new Task(() => grid.update(input, PLAYER_TIMEOUT, grid, figure));
+                task_update.Start();
 
-                //Console.WriteLine("3333333333333333333333333333");
-                //grid.render();
-                if ((counter % 20) == 0){
+                if ((counter % MAGIC_NUMBER) == 0)
+                {
                     figure.move_down(grid);
-
-                    grid.check_blast(grid);
-
-                    grid.update(input, PLAYER_TIMEOUT, grid, figure);
-
-                    grid.check_blast(grid);
-
-                    grid.render();
                 }
 
-                //grid.update(input, PLAYER_TIMEOUT, grid, figure);
+                grid.check_blast(grid);
+                grid.render();
 
                 counter++;
                 System.Threading.Thread.Sleep(PLAYER_TIMEOUT);
