@@ -60,8 +60,7 @@ namespace Tetris
                 {
                     output += area[j, i];
                 }
-                output += "|";
-                output += "\n";
+                output += "|\n";
             }
 
             for (int j = 0; j < width; j++)
@@ -69,7 +68,7 @@ namespace Tetris
                 output += "^";
             }
 
-            output += "|";
+            output += "|\n Controls: \n (P)Pause \n (W)Faster speed \n (S)Slower speed \n (Esc)Exit";
 
             Console.Write(output);
             
@@ -174,13 +173,27 @@ namespace Tetris
                return 0;
         }
 
-        static void play()
+        static void high_score()
         {
+
+
+
+        }
+
+        static void lose()
+        {
+
+
+        }
+
+        static void play(int width, int height)
+        {
+            Console.WriteLine("Press Any key");
             const int PLAYER_TIMEOUT = 4;
 
             int counter = 0;
 
-            Field grid = new Field(15, 20, 5, 0, 10, "Player1");
+            Field grid = new Field(width, height, 5, 0, 10, "Player1");
 
 
             Shape figure = new Shape(grid.start_x, grid.start_y);
@@ -214,7 +227,7 @@ namespace Tetris
 
         static void Main(string[] args)
         {
-            play();
+            play(15,20);
             return;
         }
 
