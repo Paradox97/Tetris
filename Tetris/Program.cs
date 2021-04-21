@@ -22,6 +22,10 @@ namespace Tetris
 
         string player_name;
 
+        bool exit = false;
+
+        int period = 150;
+
 
         public Field(int width_rec, int height_rec, int startx, int starty, int blocksize, string player_name_rec) //user defined field constructor 
         {
@@ -149,10 +153,21 @@ namespace Tetris
                         break;
 
                     case ConsoleKey.Escape:
+                        grid.exit = true;   
                         return 1;
 
                     case ConsoleKey.P:
                         return 2;
+
+                    case ConsoleKey.W:
+                        if (grid.period > 10)
+                            grid.period -= 10;
+                        return 3;
+
+                    case ConsoleKey.S:
+                        if (grid.period < 300)
+                            grid.period += 10;
+                        return 4;
             }
 
                return 0;
@@ -167,31 +182,26 @@ namespace Tetris
 
         static void Main(string[] args)
         {
-            const int PLAYER_TIMEOUT = 4, MAGIC_NUMBER = 150;
+            const int PLAYER_TIMEOUT = 4;
+
+            int counter = 0;
 
             Field grid = new Field(15, 20, 5, 0, 10, "Player1");
 
 
             Shape figure = new Shape(grid.start_x, grid.start_y);
 
-            bool exit = false;
-
-            int counter = 0;
-
             ConsoleKeyInfo input = Console.ReadKey(true);
 
             grid.render();
 
-            while (input.Key != ConsoleKey.Escape)
+            while (grid.exit == false)
              {
-
+                
                 Task<int> task_update = new Task<int>(() => grid.update(input, PLAYER_TIMEOUT, grid, figure));
                 task_update.Start();
 
-                if (task_update.Result == 1)
-                    return;
-
-                if ((counter % MAGIC_NUMBER) == 0)
+                if ((counter % grid.period) == 0)
                 {
                     figure.move_down(grid);
                 }
