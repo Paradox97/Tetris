@@ -127,16 +127,8 @@ namespace Tetris
 
         public async Task update(ConsoleKeyInfo input, int PLAYER_TIMEOUT, Field grid, Shape figure)
         {
-
-            //var UserInput = Console.Read(); // Get user input
-            //Console.WriteLine(UserInput);
             input = Console.ReadKey(true);
             var Result = input;
-
-            //   await Task.Run(async () =>
-            //   {
-         //   while (input.Key != ConsoleKey.Escape)
-        //    {
 
                 switch (input.Key)
                 {
@@ -156,15 +148,8 @@ namespace Tetris
                         figure.rotate(grid);
                         break;
                 }
-      //      }
-
-                   //await Task.Delay(PLAYER_TIMEOUT);
-                   //Console.WriteLine(PLAYER_TIMEOUT);
-              // }
 
                return;
-        //   });
-
         }
 
         void late_update() 
@@ -194,23 +179,16 @@ namespace Tetris
             while (input.Key != ConsoleKey.Escape)
              {
 
-                    Task task_update = new Task(() => grid.update(input, PLAYER_TIMEOUT, grid, figure));
-                    task_update.Start();
+                Task task_update = new Task(() => grid.update(input, PLAYER_TIMEOUT, grid, figure));
+                task_update.Start();
 
                 if ((counter % MAGIC_NUMBER) == 0)
                 {
                     figure.move_down(grid);
                 }
 
-                    grid.check_blast(grid);
-
-                    //grid.update(input, PLAYER_TIMEOUT, grid, figure);
-
-                    grid.check_blast(grid);
-
-                    grid.render();
-
-                //grid.update(input, PLAYER_TIMEOUT, grid, figure);
+                grid.check_blast(grid);
+                grid.render();
 
                 counter++;
                 System.Threading.Thread.Sleep(PLAYER_TIMEOUT);
