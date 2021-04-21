@@ -147,7 +147,13 @@ namespace Tetris
                     case ConsoleKey.Spacebar:
                         figure.rotate(grid);
                         break;
-                }
+
+                    case ConsoleKey.Escape:
+                        return 1;
+
+                    case ConsoleKey.P:
+                        return 2;
+            }
 
                return 0;
         }
@@ -179,8 +185,11 @@ namespace Tetris
             while (input.Key != ConsoleKey.Escape)
              {
 
-                Task task_update = new Task(() => grid.update(input, PLAYER_TIMEOUT, grid, figure));
+                Task<int> task_update = new Task<int>(() => grid.update(input, PLAYER_TIMEOUT, grid, figure));
                 task_update.Start();
+
+                if (task_update.Result == 1)
+                    return;
 
                 if ((counter % MAGIC_NUMBER) == 0)
                 {
