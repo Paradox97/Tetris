@@ -209,6 +209,8 @@ namespace Tetris
 
                 while (grid.pause == true)
                     {
+                        if (grid.exit)
+                            return;
                         System.Threading.Thread.Sleep(500);
                     }
 
