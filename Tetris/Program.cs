@@ -22,7 +22,7 @@ namespace Tetris
 
         string player_name;
 
-        bool exit = false;
+        bool exit = false, pause = false;
 
         int period = 150;
 
@@ -157,6 +157,7 @@ namespace Tetris
                         return 1;
 
                     case ConsoleKey.P:
+                        grid.pause = !grid.pause;
                         return 2;
 
                     case ConsoleKey.W:
@@ -173,14 +174,7 @@ namespace Tetris
                return 0;
         }
 
-        void late_update() 
-        { 
-        
-        
-        
-        }
-
-        static void Main(string[] args)
+        static void play()
         {
             const int PLAYER_TIMEOUT = 4;
 
@@ -196,10 +190,14 @@ namespace Tetris
             grid.render();
 
             while (grid.exit == false)
-             {
-                
+            {
                 Task<int> task_update = new Task<int>(() => grid.update(input, PLAYER_TIMEOUT, grid, figure));
                 task_update.Start();
+
+                while (grid.pause == true)
+                    {
+                        System.Threading.Thread.Sleep(500);
+                    }
 
                 if ((counter % grid.period) == 0)
                 {
@@ -211,14 +209,13 @@ namespace Tetris
 
                 counter++;
                 System.Threading.Thread.Sleep(PLAYER_TIMEOUT);
-                //input = Console.ReadKey(true);
-                //exit = true;
-
-
-                //break;
-
             }
+        }
 
+        static void Main(string[] args)
+        {
+            play();
+            return;
         }
 
     }
