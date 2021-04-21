@@ -12,7 +12,6 @@ namespace Tetris
 {
     public class Field
     {
-   
         public int width, height;
 
         public int block_size;
@@ -177,7 +176,7 @@ namespace Tetris
 
         static void Main(string[] args)
         {
-            int PLAYER_TIMEOUT = 4;
+            const int PLAYER_TIMEOUT = 4, MAGIC_NUMBER = 150;
 
             Field grid = new Field(15, 20, 5, 0, 10, "Player1");
 
@@ -195,20 +194,21 @@ namespace Tetris
             while (input.Key != ConsoleKey.Escape)
              {
 
+                    Task task_update = new Task(() => grid.update(input, PLAYER_TIMEOUT, grid, figure));
+                    task_update.Start();
 
-                //Console.WriteLine("3333333333333333333333333333");
-                //grid.render();
-                if ((counter % 20) == 0){
+                if ((counter % MAGIC_NUMBER) == 0)
+                {
                     figure.move_down(grid);
+                }
 
                     grid.check_blast(grid);
 
-                    grid.update(input, PLAYER_TIMEOUT, grid, figure);
+                    //grid.update(input, PLAYER_TIMEOUT, grid, figure);
 
                     grid.check_blast(grid);
 
                     grid.render();
-                }
 
                 //grid.update(input, PLAYER_TIMEOUT, grid, figure);
 
