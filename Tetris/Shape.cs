@@ -20,7 +20,7 @@ namespace Tetris
             s_shape = 4
         }
 
-        int centre, shape_type;
+        int center, shape_type;
 
         public struct shape_block
         {
@@ -37,131 +37,232 @@ namespace Tetris
 
         public List<shape_block> shape_map;
 
-        public Shape(int X, int Y) //Shape constructor
+        public Shape(Field grid) //Shape constructor
         {
-            shape_map_create(X, Y);
+           shape_map_create(grid);
         }
 
-        private void shape_map_create(int X, int Y)      //hard coded shapes
+        private int shape_map_create(Field grid)      //hard coded shapes
         {
+            int X = grid.start_x;
+            int Y = grid.start_y;
+
             //Random rand = new Random();
 
-            shape_type = 0; //rand.Next(0, 4);
+            shape_type = 2; //rand.Next(0, 4);
 
             shape_map = new List<shape_block>();
+            List<shape_block> check_map = new List<shape_block>();
 
-            switch (shape_type)
+                switch (shape_type)
+                {
+                    case 0://line shape
+
+                        for (int i = 0; i < 4; i++)
+                        {
+                            shape_map.Add(new shape_block()
+                            {
+                                x_coord = X + i,
+                                y_coord = Y
+                            }
+                            );
+                        }
+
+                        center = 1;
+                        break;
+
+                    case 1://l shape
+
+                        shape_map.Add(new shape_block()
+                        {
+                            x_coord = X,
+                            y_coord = Y
+                        }
+                        );
+
+
+                        for (int i = 0; i < 3; i++)
+                        {
+                            shape_map.Add(new shape_block()
+                            {
+                                x_coord = X + i,
+                                y_coord = Y + 1
+                            }
+                            );
+                        }
+
+                        center = 2;
+                        break;
+                        
+                    case 2: //reverse l shape
+
+                        shape_map.Add(new shape_block()
+                        {
+                            x_coord = X + 2,
+                            y_coord = Y
+                        }
+                        );
+
+
+                        for (int i = 0; i < 3; i++)
+                        {
+                            shape_map.Add(new shape_block()
+                            {
+                                x_coord = (X + 2) - i,
+                                y_coord = Y + 1
+                            }
+                            );
+                        }
+
+                        center = 2;
+                        break;
+
+                    case 3://square shape
+
+                        for (int i = 0; i < 2; i++)
+                            shape_map.Add(new shape_block()
+                            {
+                                x_coord = X + i,
+                                y_coord = Y
+                            }
+                       );
+
+                        for (int i = 0; i < 2; i++)
+                        {
+                            shape_map.Add(new shape_block()
+                            {
+                                x_coord = X + i,
+                                y_coord = Y + 1
+                            }
+                            );
+                        }
+
+                        center = 0;
+                        break;
+
+                    case 4://t shape
+
+                        shape_map.Add(new shape_block()
+                        {
+                            x_coord = X + 1,
+                            y_coord = Y
+                        }
+                       );
+
+                        for (int i = 0; i < 3; i++)
+                        {
+                            shape_map.Add(new shape_block()
+                            {
+                                x_coord = X + i,
+                                y_coord = Y + 1
+                            }
+                            );
+                        }
+
+                        center = 2;
+                        break;
+
+                    case 5: //s shape
+
+
+                        for (int i = 0; i < 2; i++)
+                        {
+                            shape_map.Add(new shape_block()
+                            {
+                                x_coord = X + i,
+                                y_coord = Y
+                            }
+                            );
+                        }
+
+                        for (int i = 0; i < 2; i++)
+                        {
+                            shape_map.Add(new shape_block()
+                            {
+                                x_coord = X + 1 + i,
+                                y_coord = Y + 1
+                            }
+                            );
+                        }
+
+                        center = 3;
+                        break;
+                }
+
+            for (int i = 0; i < SHAPE_SIZE; i++)
             {
-                case 0://line shape
-
-                    for (int i = 0; i < 4; i++)
-                    {
-                        shape_map.Add(new shape_block()
-                        {
-                            x_coord = X + i,
-                            y_coord = Y
-                        }
-                        );
-                    }
-
-                    centre = 1;
-                    break;
-
-                case 1://l shape
-
-                    shape_map.Add(new shape_block()
-                    {
-                        x_coord = X,
-                        y_coord = Y
-                    }
-                    );
-
-                    
-                    for (int i = 0; i < 3; i++)
-                    {
-                        shape_map.Add(new shape_block()
-                        {
-                            x_coord = X + i,
-                            y_coord = Y + 1
-                        }
-                        );
-                    }
-
-                    centre = 2;                 
-                    break;
-
-                case 2://square shape
-
-                    for (int i = 0; i < 2; i++)
-                        shape_map.Add(new shape_block()
-                    {
-                        x_coord = X + i,
-                        y_coord = Y
-                    }
-                   );
-
-                    for (int i = 0; i < 2; i++)
-                    {
-                        shape_map.Add(new shape_block()
-                        {
-                            x_coord = X + i,
-                            y_coord = Y + 1
-                        }
-                        );
-                    }
-
-                    centre = 0; 
-                    break;
-
-                case 3://t shape
-
-                    shape_map.Add(new shape_block()
-                    {
-                        x_coord = X + 1,
-                        y_coord = Y
-                    }
-                   );
-
-                    for (int i = 0; i < 3; i++)
-                    {
-                        shape_map.Add(new shape_block()
-                        {
-                            x_coord = X + i,
-                            y_coord = Y + 1
-                        }
-                        );
-                    }
-
-                    centre = 2;
-                    break;
-
-                case 4: //s shape
-
-
-                    for (int i = 0; i < 2; i++)
-                    {
-                        shape_map.Add(new shape_block()
-                        {
-                            x_coord = X + i,
-                            y_coord = Y
-                        }
-                        );
-                    }
-
-                    for (int i = 0; i < 2; i++)
-                    {
-                        shape_map.Add(new shape_block()
-                        {
-                            x_coord = X + 1 + i,
-                            y_coord = Y + 1
-                        }
-                        );
-                    }
-
-                    centre = 3;
-                    break;
+                check_map.Add(new shape_block { x_coord = shape_map[i].x_coord, y_coord = shape_map[i].y_coord + 1 });
             }
 
+            int result = check_collisions(check_map, shape_map, grid);
+
+            for (int i = 0; i < SHAPE_SIZE; i++)
+            {
+                grid.area[shape_map[i].x_coord, shape_map[i].y_coord] = '#';
+            }
+
+
+            if (result == 1)
+            {
+                return 1;
+            }
+            else 
+                return 0;
+
+        }
+
+
+        public void clear_row(Field grid, int row)
+        {
+            for (int j = 0; j < grid.width; j++)
+            {
+                grid.area[j, row] = ' ';
+                grid.score += 10;
+            }
+            apply_gravity(grid, row);
+        }
+
+        public void apply_gravity(Field grid, int row)
+        {
+
+            if (row - 1 < 0)
+            {
+                return;
+            }
+
+            for (int i = row; i > 0; i--)
+            {
+                for (int j = 0; j < grid.width; j++)
+                {
+                    grid.area[j, i] = grid.area[j, i - 1];
+                    //grid.area[j, i - 1] = ' ';  // только если гравитация действует на 1 ряд
+                }
+            }
+
+
+        }
+
+        public void check_blast(Field grid)
+        {
+            int row = 0;
+            string row_map = String.Empty;
+
+            for (int i = 0; i < grid.height; i++)
+            {
+                for (int j = 0; j < grid.width; j++)
+                {
+                    row_map += grid.area[j, i];
+                }
+
+                row = i;
+
+                if (row_map.IndexOf(' ') == -1)
+                {
+                    clear_row(grid, row);
+                }
+
+                row_map = String.Empty;
+            }
         }
 
         private int check_collisions(List<shape_block> change_map, List<shape_block> orig_map, Field grid)
@@ -222,8 +323,8 @@ namespace Tetris
 
         private void rotation_transformation(List<shape_block> change_map, List<shape_block> orig_map, Field grid)
         {
-            int delta_x = orig_map[centre].x_coord;         //placing shape block at (0,0) for rotation simplicity then placing it back where it was, delta = current coordinates of the figure        
-            int delta_y = orig_map[centre].y_coord;         //referring to the shape's centre
+            int delta_x = orig_map[center].x_coord;         //placing shape block at (0,0) for rotation simplicity then placing it back where it was, delta = current coordinates of the figure        
+            int delta_y = orig_map[center].y_coord;         //referring to the shape's centre
 
             for (int i = 0; i < SHAPE_SIZE; i++)
             {
@@ -235,8 +336,8 @@ namespace Tetris
                 change_map[i] = new shape_block { x_coord = change_map[i].y_coord, y_coord = SHAPE_SIZE - orig_map[i].x_coord };
             }
  
-            int delta_new_x = Math.Abs(change_map[centre].x_coord - delta_x); //offset - centre should be in the same location
-            int delta_new_y = Math.Abs(change_map[centre].y_coord - delta_y);
+            int delta_new_x = Math.Abs(change_map[center].x_coord - delta_x); //offset - centre should be in the same location
+            int delta_new_y = Math.Abs(change_map[center].y_coord - delta_y);
 
             for (int i = 0; i < SHAPE_SIZE; i++)
             {
@@ -248,7 +349,7 @@ namespace Tetris
         public int rotate(Field grid)
         {
 
-            if (shape_type == 2)            //square block can't rotate
+            if (shape_type == 3)            //square block can't rotate
                 return 1;
 
             List<shape_block> rotation_map = new List<shape_block>();
@@ -277,8 +378,12 @@ namespace Tetris
 
             if((check_out_of_bounds(move_down_map, grid) == 1) || (check_collisions(move_down_map, shape_map, grid) == 1))      //bottom collision
             {
-                grid.check_blast(grid); //if the shape has fallen, check full rows
-                shape_map_create(grid.start_x, grid.start_y);
+                check_blast(grid); //if the shape has fallen, check full rows
+                if (shape_map_create(grid) == 1)        //if the field is full - game over
+                {
+                    grid.gameover = true;
+                    return 2;
+                }
                 return 1;
             }
 
