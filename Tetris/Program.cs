@@ -236,6 +236,7 @@ namespace Tetris
                     switch (choice)
                     {
                         case 0:
+                            game(10, 15, alltext, state);
                             return 1;
                         case 1:
                             return 1;
@@ -262,6 +263,7 @@ namespace Tetris
 
         static void main_menu(string[] alltext, int state)
         {
+            state = 0;
             string output = string.Empty;
 
             int choice_main_menu = 0;
@@ -278,7 +280,7 @@ namespace Tetris
                 Console.Clear();
             }
             Console.SetCursorPosition(0, 0);
-            output = alltext[0] + alltext[3] + alltext[10] + alltext[4] + alltext[5];
+            output = alltext[0] + alltext[3] + alltext[10] + alltext[13] + alltext[4] + alltext[5];
             Console.Write(output);
 
             input_key = Console.ReadKey(true);
@@ -292,6 +294,10 @@ namespace Tetris
             }
 
 
+           // static_screens_travel(alltext, state, choice_main_menu);
+           // return;
+
+            
             switch (choice_main_menu)
             {
                 case 0:
@@ -402,12 +408,13 @@ namespace Tetris
                 "\nPlayer                                                        Score", //9
                 "", //10
                 "\n(Backspace)Back", //11
-                "\n(Esc)Back to the main menu" //12
+                "\n(Esc)Back to the main menu", //12
+                "\n(S)Start new game: " //13
                 };
             int state = 0;
             
 
-            //main menu - 1) 0 2    2)0 3 10 4 5
+            //main menu - 1) 0 2    2)0 3 10 13 4 5 
             //start menu - 1) 0 7 11   2)0 8 11
             //quit menu - 1) 0 6
             //high scores 1) 0 1 9 %highscores%
