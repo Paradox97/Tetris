@@ -46,10 +46,10 @@ namespace Tetris
         {
             int X = grid.start_x;
             int Y = grid.start_y;
+                //FIX RANDOM
+            Random rand = new Random();
 
-            //Random rand = new Random();
-
-            shape_type = 2; //rand.Next(0, 4);
+            shape_type = rand.Next(0, 5);
 
             shape_map = new List<shape_block>();
             List<shape_block> check_map = new List<shape_block>();
