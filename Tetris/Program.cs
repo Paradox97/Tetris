@@ -193,7 +193,7 @@ namespace Tetris
 
             int counter = 0;
 
-            Field grid = new Field(width, height, 5, 0, 10, "Player1");
+            Field grid = new Field(width, height, 0, 0, 10, "Player1");
 
 
             Shape figure = new Shape(grid.start_x, grid.start_y);
@@ -204,6 +204,7 @@ namespace Tetris
 
             while (grid.exit == false)
             {
+
                 Task<int> task_update = new Task<int>(() => grid.update(input, PLAYER_TIMEOUT, grid, figure));
                 task_update.Start();
 
@@ -219,7 +220,6 @@ namespace Tetris
                     figure.move_down(grid);
                 }
 
-                grid.check_blast(grid);
                 grid.render();
 
                 counter++;

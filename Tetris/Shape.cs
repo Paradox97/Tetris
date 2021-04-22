@@ -44,9 +44,9 @@ namespace Tetris
 
         private void shape_map_create(int X, int Y)      //hard coded shapes
         {
-            Random rand = new Random();
-            
-            shape_type = rand.Next(0, 4);
+            //Random rand = new Random();
+
+            shape_type = 0; //rand.Next(0, 4);
 
             shape_map = new List<shape_block>();
 
@@ -277,7 +277,7 @@ namespace Tetris
 
             if((check_out_of_bounds(move_down_map, grid) == 1) || (check_collisions(move_down_map, shape_map, grid) == 1))      //bottom collision
             {
-
+                grid.check_blast(grid); //if the shape has fallen, check full rows
                 shape_map_create(grid.start_x, grid.start_y);
                 return 1;
             }
