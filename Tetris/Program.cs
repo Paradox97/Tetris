@@ -66,13 +66,13 @@ namespace Tetris
                     break;
             }
 
-            area = new char[width, height];
+            this.area = new char[width, height];
 
             for (int i = 0; i < width; i++)
             {
                 for (int j = 0; j < height; j++)
                 {
-                    area[i, j] = ' ';
+                    this.area[i, j] = ' ';
                 }
             }
         }
@@ -83,17 +83,17 @@ namespace Tetris
 
             string output = string.Empty;
 
-            for (int i = 0; i < height; i++)
+            for (int i = 0; i < this.height; i++)
             {
-                for (int j = 0; j < width; j++)
+                for (int j = 0; j < this.width; j++)
                 {
-                    output += area[j, i];
+                    output += this.area[j, i];
                 }
                 output += "|\n";
 
                 if (i == 1)
                 {
-                    for (int j = 0; j < width; j++)
+                    for (int j = 0; j < this.width; j++)
                     {
                         output += '-';
                     }
@@ -101,12 +101,12 @@ namespace Tetris
                 }
             }
 
-            for (int j = 0; j < width; j++)
+            for (int j = 0; j < this.width; j++)
             {
                 output += "^";
             }
 
-            output += "|\n Score: " + score + "\n (Space)Rotate" + " (<-)Left " + "(->)Right (↓)Down \n (P)Pause (F)Faster (S)Slower (Q)Quit";
+            output += "|\n Score: " + this.score + "\n (Space)Rotate" + " (<-)Left " + "(->)Right (↓)Down \n (P)Pause (F)Faster (S)Slower (Q)Quit";
 
             Console.Write(output);
 
@@ -263,6 +263,10 @@ namespace Tetris
 
         static void main_menu(string[] alltext, int state)
         {
+            List<text_menu> text_Menus = new List<text_menu>();
+
+            //    shape_map = new List<shape_block>();
+            //List<shape_block> check_map = new List<shape_block>();
             state = 0;
             string output = string.Empty;
 
