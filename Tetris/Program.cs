@@ -7,48 +7,72 @@ using System.Threading.Tasks;
 using System.Threading;
 using System.Collections;
 using System.IO;
+using System.Collections.Generic;
 
 
 namespace Tetris
 {
     public class Field
     {
-        public int width, height;
+        public int
+            width, height,
+            block_size,
+            start_x, start_y,
+            score, period;
 
-        public int block_size;
-
-        public int score = 0;
-
-        public int start_x, start_y;
-
-        public bool gameover = false;
+        public bool
+            gameover,
+            exit, pause;
 
         public char[,] area;
 
         string player_name;
 
-        bool exit = false, pause = false;
-
-        int period = 150;
-
-
-        public Field(int width_rec, int height_rec, int startx, int starty, int blocksize, string player_name_rec) //user defined field constructor 
+        public struct text_menu
         {
-            height = height_rec;
-            width = width_rec;
-            start_x = startx;
-            start_y = starty;
-            block_size = blocksize;
-            player_name = player_name_rec;
+            public string order;
+            public string message;
 
+            public text_menu(string order, string message)
+            {
+                this.order = order;
+                this.message = message;
+            }
 
-            area = new char[width, height];
+        }
+
+        public List<text_menu> text_menus;
+
+        public Field(int width, int height, int start_x, int start_y, int block_size, int difficulty, string player_name) //user defined field constructor 
+        {
+            this.height = height;
+            this.width = width;
+            this.start_x = start_x;
+            this.start_y = start_y;
+            this.block_size = block_size;
+            this.player_name = player_name;
+            this.period = 150;  //from constructor
+
+            switch (difficulty)
+            {
+                case 1:
+                    this.period = 150;
+                    break;
+                case 2:
+                    this.period = 120;
+                    break;
+                case 3:
+                    this.period = 90;
+                    break;
+            }
+
+            this.area = new char[width, height];
 
             for (int i = 0; i < width; i++)
             {
                 for (int j = 0; j < height; j++)
                 {
-                    area[i, j] = ' '; 
+                    this.area[i, j] = ' ';
                 }
             }
         }
@@ -59,17 +83,17 @@ namespace Tetris
 
             string output = string.Empty;
 
-            for (int i = 0; i < height; i++)
+            for (int i = 0; i < this.height; i++)
             {
-                for (int j = 0; j < width; j++)
+                for (int j = 0; j < this.width; j++)
                 {
-                    output += area[j, i];
+                    output += this.area[j, i];
                 }
                 output += "|\n";
 
-                if(i == 1)
+                if (i == 1)
                 {
-                    for (int j = 0; j < width; j++)
+                    for (int j = 0; j < this.width; j++)
                     {
                         output += '-';
                     }
@@ -77,59 +101,59 @@ namespace Tetris
                 }
             }
 
-            for (int j = 0; j < width; j++)
+            for (int j = 0; j < this.width; j++)
             {
                 output += "^";
             }
 
-            output += "|\n Score: " + score + "\n (Space)Rotate"+ " (<-)Left " + "(->)Right (↓)Down \n (P)Pause (F)Faster (S)Slower (Esc)Exit";
+            output += "|\n Score: " + this.score + "\n (Space)Rotate" + " (<-)Left " + "(->)Right (↓)Down \n (P)Pause (F)Faster (S)Slower (Q)Quit";
 
             Console.Write(output);
-            
+
         }
 
         public int update(ConsoleKeyInfo input, int PLAYER_TIMEOUT, Field grid, Shape figure)
         {
             input = Console.ReadKey(true);
 
-                switch (input.Key)
-                {
-                    case ConsoleKey.LeftArrow:
-                        figure.move_left(grid);
-                        break;              //watch breaks and returns
+            switch (input.Key)
+            {
+                case ConsoleKey.LeftArrow:
+                    figure.move_left(grid);
+                    break;              //watch breaks and returns
 
-                    case ConsoleKey.RightArrow:
-                        figure.move_right(grid);
-                        break;
+                case ConsoleKey.RightArrow:
+                    figure.move_right(grid);
+                    break;
 
-                    case ConsoleKey.DownArrow:
-                        figure.move_down(grid);
-                        break;
+                case ConsoleKey.DownArrow:
+                    figure.move_down(grid);
+                    break;
 
-                    case ConsoleKey.Spacebar:
-                        figure.rotate(grid);
-                        break;
+                case ConsoleKey.Spacebar:
+                    figure.rotate(grid);
+                    break;
 
-                    case ConsoleKey.Escape:
-                        grid.exit = true;   
-                        return 1;
+                case ConsoleKey.Q:
+                    grid.exit = true;
+                    return 1;
 
-                    case ConsoleKey.P:
-                        grid.pause = !grid.pause;
-                        return 2;
+                case ConsoleKey.P:
+                    grid.pause = !grid.pause;
+                    return 2;
 
-                    case ConsoleKey.F:
-                        if (grid.period > 10)
-                            grid.period -= 10;
-                        return 3;
+                case ConsoleKey.F:
+                    if (grid.period > 10)
+                        grid.period -= 10;
+                    return 3;
 
-                    case ConsoleKey.S:
-                        if (grid.period < 300)
-                            grid.period += 10;
-                        return 4;
+                case ConsoleKey.S:
+                    if (grid.period < 300)
+                        grid.period += 10;
+                    return 4;
             }
 
-               return 0;
+            return 0;
         }
 
         static void high_score()
@@ -168,7 +192,7 @@ namespace Tetris
                 case ConsoleKey.H:
                     return 1;
 
-                case ConsoleKey.Escape:
+                case ConsoleKey.Q:
                     return 2;
 
                 case ConsoleKey.Y:
@@ -190,44 +214,77 @@ namespace Tetris
 
         }
 
-        static void start()
+        static void start(string[] alltext, int state)
         {
+            string output = string.Empty;
+            ConsoleKeyInfo input_key;
+
+            int choice_start_menu = 0;
+
+            Console.SetCursorPosition(0, 0);
+            output = alltext[0] + alltext[7];
+            //Console
 
 
         }
 
-        static void main_menu()
+        static int static_screens_travel(string[] alltext, int state, int choice)
         {
-            //menu divided by pieces
-            string greetings, player_name_req = string.Empty;
-            string start = string.Empty;
-            string player_name_show, player_name = string.Empty; 
-            string quit, quit_sure = string.Empty;
-            string highscore_menu, greetings_highscore, highscore = string.Empty;
-            string output,input = string.Empty;
+            switch (state) 
+            {
+                case 0:             //main menu
+                    switch (choice)
+                    {
+                        case 0:
+                            game(10, 15, alltext, state);
+                            return 1;
+                        case 1:
+                            return 1;
+                        case 2:
+                            escape(alltext, state);
+                            return 2;
+                        case 3:
+                            return 3;
+                        case 4:
+                            return 4;
+                    }
+                 break;
+                case 1:            //difficulty choice menu
+                    break;
+                case 2:            //field size choice menu
+                    break;
+                case 4:            //high score screen
+                    break;
+                case 5:            //quit screen
+                    break;  
+            }
+            return 5;
+        }
+
+        static void main_menu(string[] alltext, int state)
+        {
+            List<text_menu> text_Menus = new List<text_menu>();
+
+            //    shape_map = new List<shape_block>();
+            //List<shape_block> check_map = new List<shape_block>();
+            state = 0;
+            string output = string.Empty;
 
             int choice_main_menu = 0;
             ConsoleKeyInfo input_key;
 
             Console.SetCursorPosition(0, 0);
-            greetings = "##########W E L C O M E         T O         T E T R I S !##########";
-            greetings_highscore = "Highscores";
-            player_name_req = "\nEnter player name: ";
-            player_name_show = "\nPlayer: "; 
-            highscore_menu = "\n(H)Show highscores";
-            quit = "\n(Esc)Quit Tetris";
-            quit_sure = "\nAre you sure(Y/N)?";
 
-            output = greetings + player_name_req;
+            output = alltext[14] + alltext[0] + alltext[2];
 
-            while(player_name == string.Empty)
+            while (alltext[10] == string.Empty)
             {
                 Console.Write(output);
-                player_name = Console.ReadLine();
+                alltext[10] = Console.ReadLine();
                 Console.Clear();
             }
             Console.SetCursorPosition(0, 0);
-            output = greetings + player_name_show + player_name + highscore_menu + quit;
+            output = alltext[14] + alltext[0] + alltext[3] + alltext[10] + alltext[13] + alltext[5];//alltext[4] + alltext[5];
             Console.Write(output);
 
             input_key = Console.ReadKey(true);
@@ -240,16 +297,21 @@ namespace Tetris
                 Console.Clear();
             }
 
+
+           // static_screens_travel(alltext, state, choice_main_menu);
+           // return;
+
+            
             switch (choice_main_menu)
             {
                 case 0:
-                    game(15, 20, player_name);
+                    game(15, 20, alltext, state);
                     break;
                 case 1:
                     high_score();
                     break;
                 case 2:
-                    escape();
+                    escape(alltext, state);
                     return;
 
                 case 3:
@@ -264,17 +326,17 @@ namespace Tetris
 
         }
 
-        static void escape()
+        static void escape(string[] alltext, int state)
         {
             int choice = 0;
             ConsoleKeyInfo input_key;
-            Console.Write("Exit menu");
+            Console.Write("Are you sure?(Y/N)");
             input_key = Console.ReadKey(true);
             Console.Clear();
 
             while ((choice = navigation(input_key)) > 7)
             {
-                Console.Write("Exit menu");
+                Console.Write("Are you sure?(Y/N)");
                 input_key = Console.ReadKey(true);
                 Console.Clear();
             }
@@ -284,19 +346,19 @@ namespace Tetris
                 case 3:
                     return;
                 case 4:
-                    main_menu();
+                    main_menu(alltext, state);
                     break;
             }
         }
 
-        static int game(int width, int height, string player_name)
+        static int game(int width, int height, string[] alltext, int state)
         {
             Console.WriteLine("Press Any key");
             const int PLAYER_TIMEOUT = 3;
 
             int counter = 0;
 
-            Field grid = new Field(width, height, 0, 0, 10, player_name);
+            Field grid = new Field(width, height, 0, 0, 10, 0, alltext[10]);
 
 
             Shape figure = new Shape(grid);
@@ -307,8 +369,15 @@ namespace Tetris
 
             while (grid.exit == false)
             {
-                if (grid.gameover == true)     
+                if (grid.gameover == true)
+                {
+                    Console.Clear();
+                    Console.WriteLine(alltext[15] + "\n Press Any key");
+                    Console.ReadKey();
+                    Console.Clear();
+                    main_menu(alltext, state);
                     return 4;   //game over state
+                }
 
                 grid.render();
 
@@ -318,7 +387,14 @@ namespace Tetris
                 while (grid.pause == true)
                 {
                     if (grid.exit)
-                        return 3;       //quit
+                    {
+                        Console.Clear();
+                        Console.WriteLine(alltext[15] + "\n Press Any key");
+                        Console.ReadKey();
+                        Console.Clear();
+                        main_menu(alltext, state);
+                        return 3;
+                    }      //quit
                     System.Threading.Thread.Sleep(500);
                 }
 
@@ -331,12 +407,61 @@ namespace Tetris
                 System.Threading.Thread.Sleep(PLAYER_TIMEOUT);
             }
 
+            
+            Console.Clear();
+            Console.WriteLine(alltext[15] + "\n Press Any key");
+            Console.ReadKey();
+            Console.Clear();
+            main_menu(alltext, state);
             return 1; //game over
+        }
+
+        static void game_over_sequence()
+        {
+            //check double tap on gameover sequence
         }
 
         static void Main(string[] args)
         {
-            main_menu();
+            //all text menu divided by pieces
+            string[] alltext =
+                { "\n##########W E L C O M E         T O         T E T R I S !##########", //0
+                "\n###########H I G H                           S C O R E S###########", //1
+                "\nEnter player name: ", //2 
+                "\nPlayer: ", //3
+                "\n(H)Show highscores ", //4 
+                "\n(Q)Quit Tetris ", //5
+                "\nAre you sure(Y/N)?", //6
+                "\nChoose difficulty:\n(1)Easy\n(2)Medium\n(3)Hard,", //7
+                "\nChoose field size:\n(1)Little\n(2)Medium\n(3)Big", //8
+                "\nPlayer                                                        Score", //9
+                "", //10
+                "\n(Backspace)Back", //11
+                "\n(Esc)Back to the main menu", //12
+                "\n(S)Start new game: ", //13
+                @"    _________  _______  _________  ________  ___  ________      " + "\n" + @"   |\___   ___\\  ___ \|\___   ___\\   __  \|\  \|\   ____\     " + "\n" +
+                @"   \|___ \  \_\ \   __/\|___ \  \_\ \  \|\  \ \  \ \  \___|_    " +"\n" + @"        \ \  \ \ \  \_|/__  \ \  \ \ \   _  _\ \  \ \_____  \   " +
+                "\n" + @"         \ \  \ \ \  \_|\ \  \ \  \ \ \  \\  \\ \  \|____|\  \  " + "\n" + @"          \ \__\ \ \_______\  \ \__\ \ \__\\ _\\ \__\____\_\  \ " +
+                "\n" + @"           \|__|  \|_______|   \|__|  \|__|\|__|\|__|\_________\"+"\n"+ @"                                                    \|_________|",   //14
+                @" ________  ________  _____ ______   _______          " + "\n" + @"|\   ____\|\   __  \|\   _ \  _   \|\  ___ \         " + "\n" +
+                @"\ \  \___|\ \  \|\  \ \  \\\__\ \  \ \   __/|        " + "\n" + @" \ \  \  __\ \   __  \ \  \\|__| \  \ \  \_|/__      " + "\n" +
+                @"  \ \  \|\  \ \  \ \  \ \  \    \ \  \ \  \_|\ \     " +"\n" +@"   \ \_______\ \__\ \__\ \__\    \ \__\ \_______\    " + "\n" +
+                @"    \|_______|\|__|\|__|\|__|     \|__|\|_______|    " +"\n" +@" ________  ___      ___ _______   ________           " + "\n" +
+                @"|\   __  \|\  \    /  /|\  ___ \ |\   __  \          " + "\n" +@"\ \  \|\  \ \  \  /  / | \   __/|\ \  \|\  \         " +"\n" +
+                @" \ \  \\\  \ \  \/  / / \ \  \_|/_\ \   _  _\        " +"\n" +@"  \ \  \\\  \ \    / /   \ \  \_|\ \ \  \\  \|       " +"\n" +
+                @"   \ \_______\ \__/ /     \ \_______\ \__\\ _\       " + "\n" +@"    \|_______|\|__|/       \|_______|\|__|\|__|      "       //15
+                };
+            int state = 0;
+
+            Console.WriteLine(alltext[14]+"\n Press Any key");
+            Console.ReadKey();
+            Console.Clear();
+            //main menu - 1) 0 2    2)0 3 10 13 4 5 
+            //start menu - 1) 0 7 11   2)0 8 11
+            //quit menu - 1) 0 6
+            //high scores 1) 0 1 9 %highscores%
+
+            main_menu(alltext, state);
             //high_score();
             //string player_name = string.Empty;
             //game(15,20, player_name);
