@@ -330,13 +330,14 @@ namespace Tetris
         {
             int choice = 0;
             ConsoleKeyInfo input_key;
-            Console.Write("Are you sure?(Y/N)");
+            Console.Clear();
+            Console.Write(alltext[6]);
             input_key = Console.ReadKey(true);
             Console.Clear();
 
             while ((choice = navigation(input_key)) > 7)
             {
-                Console.Write("Are you sure?(Y/N)");
+                Console.Write(alltext[6]);
                 input_key = Console.ReadKey(true);
                 Console.Clear();
             }
@@ -353,7 +354,10 @@ namespace Tetris
 
         static int game(int width, int height, string[] alltext, int state)
         {
-            Console.WriteLine("Press Any key");
+            Console.Clear();
+            Console.WriteLine(alltext[16]);
+            Console.ReadKey();
+            Console.Clear();
             const int PLAYER_TIMEOUT = 3;
 
             int counter = 0;
@@ -372,7 +376,7 @@ namespace Tetris
                 if (grid.gameover == true)
                 {
                     Console.Clear();
-                    Console.WriteLine(alltext[15] + "\n Press Any key");
+                    Console.WriteLine(alltext[15] + alltext[16]);
                     Console.ReadKey();
                     Console.Clear();
                     main_menu(alltext, state);
@@ -389,7 +393,7 @@ namespace Tetris
                     if (grid.exit)
                     {
                         Console.Clear();
-                        Console.WriteLine(alltext[15] + "\n Press Any key");
+                        Console.WriteLine(alltext[15] + alltext[16]);
                         Console.ReadKey();
                         Console.Clear();
                         main_menu(alltext, state);
@@ -409,7 +413,7 @@ namespace Tetris
 
             
             Console.Clear();
-            Console.WriteLine(alltext[15] + "\n Press Any key");
+            Console.WriteLine(alltext[15] + alltext[16]);
             Console.ReadKey();
             Console.Clear();
             main_menu(alltext, state);
@@ -425,7 +429,7 @@ namespace Tetris
         {
             //all text menu divided by pieces
             string[] alltext =
-                { "\n##########W E L C O M E         T O         T E T R I S !##########", //0
+              { "\n##########W E L C O M E         T O         T E T R I S !##########", //0
                 "\n###########H I G H                           S C O R E S###########", //1
                 "\nEnter player name: ", //2 
                 "\nPlayer: ", //3
@@ -439,21 +443,33 @@ namespace Tetris
                 "\n(Backspace)Back", //11
                 "\n(Esc)Back to the main menu", //12
                 "\n(S)Start new game: ", //13
-                @"    _________  _______  _________  ________  ___  ________      " + "\n" + @"   |\___   ___\\  ___ \|\___   ___\\   __  \|\  \|\   ____\     " + "\n" +
-                @"   \|___ \  \_\ \   __/\|___ \  \_\ \  \|\  \ \  \ \  \___|_    " +"\n" + @"        \ \  \ \ \  \_|/__  \ \  \ \ \   _  _\ \  \ \_____  \   " +
-                "\n" + @"         \ \  \ \ \  \_|\ \  \ \  \ \ \  \\  \\ \  \|____|\  \  " + "\n" + @"          \ \__\ \ \_______\  \ \__\ \ \__\\ _\\ \__\____\_\  \ " +
-                "\n" + @"           \|__|  \|_______|   \|__|  \|__|\|__|\|__|\_________\"+"\n"+ @"                                                    \|_________|",   //14
-                @" ________  ________  _____ ______   _______          " + "\n" + @"|\   ____\|\   __  \|\   _ \  _   \|\  ___ \         " + "\n" +
-                @"\ \  \___|\ \  \|\  \ \  \\\__\ \  \ \   __/|        " + "\n" + @" \ \  \  __\ \   __  \ \  \\|__| \  \ \  \_|/__      " + "\n" +
-                @"  \ \  \|\  \ \  \ \  \ \  \    \ \  \ \  \_|\ \     " +"\n" +@"   \ \_______\ \__\ \__\ \__\    \ \__\ \_______\    " + "\n" +
-                @"    \|_______|\|__|\|__|\|__|     \|__|\|_______|    " +"\n" +@" ________  ___      ___ _______   ________           " + "\n" +
-                @"|\   __  \|\  \    /  /|\  ___ \ |\   __  \          " + "\n" +@"\ \  \|\  \ \  \  /  / | \   __/|\ \  \|\  \         " +"\n" +
-                @" \ \  \\\  \ \  \/  / / \ \  \_|/_\ \   _  _\        " +"\n" +@"  \ \  \\\  \ \    / /   \ \  \_|\ \ \  \\  \|       " +"\n" +
-                @"   \ \_______\ \__/ /     \ \_______\ \__\\ _\       " + "\n" +@"    \|_______|\|__|/       \|_______|\|__|\|__|      "       //15
+                @"    _________  _______  _________  ________  ___  ________      " + "\n" + 
+                @"   |\___   ___\\  ___ \|\___   ___\\   __  \|\  \|\   ____\     " + "\n" +
+                @"   \|___ \  \_\ \   __/\|___ \  \_\ \  \|\  \ \  \ \  \___|_    " +"\n" + 
+                @"        \ \  \ \ \  \_|/__  \ \  \ \ \   _  _\ \  \ \_____  \   " + "\n" + 
+                @"         \ \  \ \ \  \_|\ \  \ \  \ \ \  \\  \\ \  \|____|\  \  " + "\n" + 
+                @"          \ \__\ \ \_______\  \ \__\ \ \__\\ _\\ \__\____\_\  \ " +"\n" + 
+                @"           \|__|  \|_______|   \|__|  \|__|\|__|\|__|\_________\"+"\n"+ 
+                @"                                                    \|_________|",   //14
+                @" ________  ________  _____ ______   _______          " + "\n" + 
+                @"|\   ____\|\   __  \|\   _ \  _   \|\  ___ \         " + "\n" +
+                @"\ \  \___|\ \  \|\  \ \  \\\__\ \  \ \   __/|        " + "\n" + 
+                @" \ \  \  __\ \   __  \ \  \\|__| \  \ \  \_|/__      " + "\n" +
+                @"  \ \  \|\  \ \  \ \  \ \  \    \ \  \ \  \_|\ \     " +"\n" +
+                @"   \ \_______\ \__\ \__\ \__\    \ \__\ \_______\    " + "\n" +
+                @"    \|_______|\|__|\|__|\|__|     \|__|\|_______|    " +"\n" +
+                @" ________  ___      ___ _______   ________           " + "\n" +
+                @"|\   __  \|\  \    /  /|\  ___ \ |\   __  \          " + "\n" +
+                @"\ \  \|\  \ \  \  /  / | \   __/|\ \  \|\  \         " +"\n" +
+                @" \ \  \\\  \ \  \/  / / \ \  \_|/_\ \   _  _\        " +"\n" +
+                @"  \ \  \\\  \ \    / /   \ \  \_|\ \ \  \\  \|       " +"\n" +
+                @"   \ \_______\ \__/ /     \ \_______\ \__\\ _\       " + "\n" +
+                @"    \|_______|\|__|/       \|_______|\|__|\|__|      ",       //15
+                "\n                           Press Any key                             "   //16
                 };
             int state = 0;
 
-            Console.WriteLine(alltext[14]+"\n Press Any key");
+            Console.WriteLine(alltext[14] + alltext[16]);
             Console.ReadKey();
             Console.Clear();
             //main menu - 1) 0 2    2)0 3 10 13 4 5 
